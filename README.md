@@ -34,7 +34,7 @@ Then go to the folder with the ``setup.py`` file. And run
 
 ````pip install .````
 
-Now you've installed the package. You could use it at any place of your account. If you are not clear about auy command, you could find help by the command
+Now you've installed the package. You could use it at any place of your account. If you are not clear about any command, you could find help by the command
 
 ````NanoPsiPy_estimation -h````
 
