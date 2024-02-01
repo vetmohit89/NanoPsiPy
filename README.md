@@ -1,9 +1,8 @@
 
 # NanoPsiPy:
-![github MALAT1](https://github.com/vetmohit89/NanoPsiPy/assets/110649675/8e7459df-fee9-48f7-a951-b5dca02bba84)
 
 # Description
-NanoPsiPy method identify and quantify transcriptome-wide pseudouridine (Î¨) modification using U-to-C basecalling "error" signature as a distinctive feature of Î¨ in Direct RNA sequencing data.
+NanoPsiPy method identify and quantify transcriptome-wide pseudouridine (Ψ) modification using U-to-C basecalling "error" signature as a distinctive feature of Ψ in Direct RNA sequencing data.
 
 # Package versions
 The version of softwares and packages for testing codes:
@@ -105,7 +104,7 @@ In your `plus_strand` and `minus_strand` folders you'll find a new file named `c
 ```
 
 ## A (iii) Feature extraction at each U site
-Then extract features of all U sites. In order to remove poor quality reads accouting for U to C basecalling error, there is a threshold for a U site which is â‰¥9 reads. Only U sites with â‰¥9 reads will be processed for following analysis. This step is computation intensive.
+Then extract features of all U sites. In order to remove poor quality reads accouting for U to C basecalling error, there is a threshold for a U site which is ≥9 reads. Only U sites with ≥9 reads will be processed for following analysis. This step is computation intensive.
 
 The output file is `features.csv` in the `alignment` folder. This file contains information from reads aligned to both forward and reverse strands.
 
@@ -115,7 +114,7 @@ To estimate the psU level of all the U sites from `features.csv`, The extraction
 
 **```Note: Run the same above code for treatment (knockdown or knockout) sample in a separate folder.```**
  
-## B. PSI comparison between two samples: To compare between two conditions, execute the following command to estimate the significant Î¨ at each U site:
+## B. PSI comparison between two samples: To compare between two conditions, execute the following command to estimate the significant Ψ at each U site:
 ```bash
 NanoPsiPy_comparison -c ./control_file.csv -t ./treatment_file.csv -o output_folder -d reference_data_type (genome or transcriptome)
 ```

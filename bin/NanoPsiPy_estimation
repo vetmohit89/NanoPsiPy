@@ -1,0 +1,52 @@
+#!/usr/bin/env python
+import subprocess
+import argparse
+import sys
+import os
+
+from NanoPsiPy.align import align
+from NanoPsiPy.process_alignment import re_in
+from NanoPsiPy.Pseudo_U_estimation import process_strand_file
+from NanoPsiPy.Pseudo_U_estimation import ex_fe
+from NanoPsiPy.PSI_estimation import calculate_reads
+from NanoPsiPy.PSI_estimation import estimate
+
+# Get the directory of the currently executing script
+script_dir = os.getcwd()
+
+# Create argument parser
+parser = argparse.ArgumentParser(description="Run alignment and data processing scripts.")
+parser.add_argument('-i', '--input-folder', required=True, help="Input folder name")
+parser.add_argument('-r', '--reference-file', required=True, help="Reference file name")
+parser.add_argument('-s', '--sample-name', required=True, help="Specify the sample name")
+parser.add_argument('-o', '--output-file', required=True, help="Output file name")
+
+# Parse the command-line arguments
+args = parser.parse_args()
+input_folder_name = args.input_folder
+ref_name = args.reference_file
+sample_name = args.sample_name
+output_file_name = args.output_file
+
+# Construct paths to other scripts using the script directory
+align_script = os.path.join(script_dir, "align.py")
+process_alignment_script = os.path.join(script_dir, "process_alignment.py")
+pseudo_u_estimation_script = os.path.join(script_dir, "Pseudo_U_estimation.py")
+psi_estimation_script = os.path.join(script_dir, "PSI_estimation.py")
+
+# Run align.py with command-line arguments
+#align_2_command = ["python", align_script, input_folder_name, ref_name]
+#subprocess.run(align_2_command, check=True)
+align(input_folder_name, ref_name)
+
+# Run process_alignment.py
+#subprocess.run(["python", process_alignment_script], check=True)
+re_in()
+
+# Run Pseudo_U_estimation.py
+#subprocess.run(["python", pseudo_u_estimation_script], check=True)
+ex_fe()
+
+# Run PSI_estimation.py with the provided output file name and sample name as command-line arguments
+#psi_update_command = ["python", psi_estimation_script, "--s", sample_name, "--o", output_file_name]
+estimate(sample_name, output_file_name)
