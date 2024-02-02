@@ -4,7 +4,6 @@
 import os
 import sys
 
-__author__ = "Sihao Huang"
 __license__ = "GPL 3.0"
 
 def align(in_folder_name, ref_name):
