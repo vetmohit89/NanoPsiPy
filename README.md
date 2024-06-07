@@ -1,5 +1,5 @@
 
-# NanoPsiPy:
+# NanoPsiPy: Introducing a Tool for Estimating Pseudouridine Levels Through U-to-C Base-Calling Error Analysis in Direct RNA Nanopore Sequencing Data.
 
 # Description
 NanoPsiPy method identify and quantify transcriptome-wide pseudouridine (Ψ) modification using U-to-C basecalling "error" signature as a distinctive feature of Ψ in Direct RNA sequencing data.
