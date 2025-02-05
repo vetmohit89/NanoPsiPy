@@ -5,13 +5,40 @@ import re
 import numpy
 from collections import Counter
 
-def process_strand_file(input_file, outcsv):
+def read_reference_sequence(ref_file):
+    result_map = {}
+    with open(ref_file, "r") as file:
+        lines = file.readlines()  # Read all lines into a list
+        
+        # Iterate through lines in pairs (key-value pairs)
+        for i in range(0, len(lines), 2):
+            key = lines[i].strip()  # Strip whitespace from the key
+            key = key[1:]
+            if i+1 < len(lines):  # Check if there is a corresponding value line
+                value = lines[i+1].strip()  # Strip whitespace from the value
+                result_map[key] = value  # Add key-value pair to the dictionary
+            else:
+                result_map[key] = None  # If no value, set value as None
+    
+    return result_map
+
+def process_strand_file(input_file, outcsv, reference_seq):
     for line in input_file:
         site = line.strip("\n").split("\t")
         if site[2] == "T" and int(site[3]) > 8:
+            position = int(site[1])  # Position in the alignment
             out_line = site[:4]
             pattern = re.compile("\\^.")
             alignment = re.sub(pattern, "", site[4])
+
+            # Extract k-mer information
+            ref_seq_chr = reference_seq[site[0]]
+            kmer_list = []
+            if position - 3 >= 0 and position + 2 < len(ref_seq_chr):  # Ensure we don't go out of bounds
+                kmer = ref_seq_chr[position - 3: position + 2]  # 3 bases before and 2 after
+                kmer_list.append(kmer)
+
+            out_line.append(";".join(kmer_list) if kmer_list else "NA")  # Handle empty k-mer case
 
             pattern2 = re.compile("\\+[0-9]+[ATCGNatcgn]+")
             result2 = pattern2.findall(alignment)
@@ -77,14 +104,24 @@ def ex_fe():
     minus_folder = os.path.join(in_folder, "minus_strand")
     out_file = os.path.join(in_folder, "features.csv")
 
+    # Read the reference sequence from plus strand reference.fa
+    reference_file_plus = os.path.join(plus_folder, "reference.fa")
+    reference_seq_plus = read_reference_sequence(reference_file_plus)
+
+    # Optional: Read the reference sequence from minus strand if needed
+    reference_file_minus = os.path.join(minus_folder, "reference.fa")
+    reference_seq_minus = read_reference_sequence(reference_file_minus) if os.path.exists(reference_file_minus) else None
+
     with open(out_file, "w+", newline="") as output:
         outcsv = csv.writer(output)
 
+        # Define column headers, including kmer
         columns = [
             "ID",
             "position",
             "base_type",
             "coverage",
+            "kmer",  # Added kmer column
             "ins",
             "ins_len",
             "del",
@@ -101,15 +138,13 @@ def ex_fe():
         ]
         outcsv.writerow(columns)
 
+        # Process plus strand file
         plus_file = os.path.join(plus_folder, "collect_pile_no_intron.txt")
         with open(plus_file, "r") as input_file:
-            process_strand_file(input_file, outcsv)
+            process_strand_file(input_file, outcsv, reference_seq_plus)
 
-        # Continue processing for minus_strand folder
+        # Process minus strand file if it exists
         if os.path.exists(minus_folder):
             minus_file = os.path.join(minus_folder, "collect_pile_no_intron.txt")
             with open(minus_file, "r") as input_file:
-                process_strand_file(input_file, outcsv)
-
-
-
+                process_strand_file(input_file, outcsv, reference_seq_minus if reference_seq_minus else reference_seq_plus)
