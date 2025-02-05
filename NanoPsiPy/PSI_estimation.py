@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 import csv
 import os
-import sys
-import argparse
 
 # Function to calculate C_reads and T_reads for each row
 def calculate_reads(row, sample_name):
@@ -15,7 +13,6 @@ def calculate_reads(row, sample_name):
     row["{}_C_reads".format(sample_name)] = C_reads
     row["{}_T_reads".format(sample_name)] = T_reads
 
-    
 def estimate(sample_name, output_file_name):
     # Get the current directory path
     current_directory = os.getcwd()
@@ -24,8 +21,8 @@ def estimate(sample_name, output_file_name):
     alignment_folder = os.path.join(current_directory, "alignment")
     input_file = os.path.join(alignment_folder, "features.csv")
 
-    # Columns to extract
-    columns_to_extract = ["ID", "position", "base_type", "coverage", "misC"]
+    # Columns to extract, including kmer
+    columns_to_extract = ["ID", "position", "base_type", "coverage", "kmer", "misC"]
 
     # Read the input file and extract the desired columns
     data = []
@@ -43,35 +40,34 @@ def estimate(sample_name, output_file_name):
     for row in data:
         calculate_reads(row, sample_name)
 
+    # Prepare fieldnames, including kmer
+    fieldnames = [key for key in data[0].keys() if key not in ["coverage", "misC"]]
+
     # Check if the output file exists
     if os.path.isfile(output_file_name):
         # Append data to the existing output file
         with open(output_file_name, "a", newline="") as file:
-            # Remove "misC" and "coverage" keys before writing
-            for row in data:
-                row.pop("misC", None)
-                row.pop("coverage", None)
-
-            # Write data to the output file
-            writer = csv.DictWriter(file, fieldnames=[key for key in data[0].keys() if key != "coverage"])
+            writer = csv.DictWriter(file, fieldnames=fieldnames)
 
             # Write header if the file is empty
             if os.path.getsize(output_file_name) == 0:
                 writer.writeheader()
 
-            writer.writerows(data)
+            # Write data to the output file
+            for row in data:
+                row.pop("misC", None)
+                row.pop("coverage", None)  # Remove coverage only for writing
+                writer.writerow(row)
     else:
         # Create a new output file and write the data
         with open(output_file_name, "w", newline="") as file:
-            # Remove "misC" and "coverage" keys before writing
-            for row in data:
-                row.pop("misC", None)
-                row.pop("coverage", None)
+            writer = csv.DictWriter(file, fieldnames=fieldnames)
+            writer.writeheader()
 
             # Write data to the output file
-            writer = csv.DictWriter(file, fieldnames=[key for key in data[0].keys() if key != "coverage"])
+            for row in data:
+                row.pop("misC", None)
+                row.pop("coverage", None)  # Remove coverage only for writing
+                writer.writerow(row)
 
-            writer.writeheader()
-            writer.writerows(data)
-
-    print("Extraction and calculation completed. The updated data (without misC and coverage columns) is saved to:", output_file_name)
+    print("Extraction and calculation completed. The updated data (without coverage column) is saved to:", output_file_name)
