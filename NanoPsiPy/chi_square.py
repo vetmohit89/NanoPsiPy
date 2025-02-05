@@ -1,7 +1,8 @@
+import argparse
 import pandas as pd
 from scipy.stats import chi2_contingency
 
-def analyze(data):
+def analyze(data, significance_level):
     # Load the data
     # data = pd.read_csv('merged.csv')
 
@@ -27,8 +28,13 @@ def analyze(data):
     # Apply the function to each row
     data['p_value'] = data.apply(calculate_pvalue, axis=1)
 
-    # Add 'p_below_1' column
-    data['p_below_1'] = data['p_value'].apply(lambda p: 'Yes' if p <= 0.01 else 'No')
+    # Add column based on significance level
+    if significance_level == 'p_below_5':
+        data['p_below_5'] = data['p_value'].apply(lambda p: 'Yes' if p <= 0.05 else 'No')
+    elif significance_level == 'p_below_1':
+        data['p_below_1'] = data['p_value'].apply(lambda p: 'Yes' if p <= 0.01 else 'No')
+    else:
+        print("Invalid significance level. Please choose 'p_below_5' or 'p_below_1'.")
 
     # Multiply 'control_misC' and 'treatment_misC' columns by 100
     data[['control_misC', 'treatment_misC']] *= 100
