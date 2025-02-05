@@ -4,6 +4,7 @@
 import os
 import sys
 
+__author__ = "Sihao Huang"
 __license__ = "GPL 3.0"
 
 def align(in_folder_name, ref_name):
@@ -13,10 +14,16 @@ def align(in_folder_name, ref_name):
     temp_folder = os.path.join(working_path, "temp")
     out_folder = os.path.join(working_path, "alignment")
 
+    # Check if reference file exists
+    if not os.path.isfile(ref_fa):
+        print(f"Error: Reference file '{ref_fa}' does not exist.")
+        return
+
     if not os.path.exists(temp_folder):
         os.mkdir(temp_folder)
     if not os.path.exists(out_folder):
         os.mkdir(out_folder)
+    
     in_temp_fastq = os.path.join(temp_folder, "all_pass_fastq.fastq")
     with open(in_temp_fastq, "w+") as out_f:
         for item in os.listdir(in_folder):
@@ -31,6 +38,8 @@ def align(in_folder_name, ref_name):
                             switch = 0
                             line = line.replace("U", "T")
                         out_f.write(line)
+
+    sam_file = os.path.join(temp_folder, "all_pass_fastq.sam")
 
     def rev_comp(ref):
         rev_comp = []
@@ -55,8 +64,8 @@ def align(in_folder_name, ref_name):
         list1.reverse()
         return "".join(list1)
 
-    sam_file = os.path.join(temp_folder, "all_pass_fastq.sam")
-    os.system("minimap2 -ax splice -uf -k14 --secondary=no " + ref_fa + " " + in_temp_fastq + " > " + sam_file)
+    # Replace minimap2 command with Bowtie2
+    os.system("bowtie2 -p 2 --no-unal --local -L 16 -N 1 --mp 4 -x hg38-tRNAs -U " + in_temp_fastq + " -S " + sam_file)
 
     out_sub_folder = os.path.join(out_folder, "plus_strand")
     out_sub_folder1 = os.path.join(out_folder, "minus_strand")
@@ -64,8 +73,10 @@ def align(in_folder_name, ref_name):
         os.mkdir(out_sub_folder)
     if not os.path.exists(out_sub_folder1):
         os.mkdir(out_sub_folder1)
+    
     out_file = os.path.join(out_sub_folder, "collect.fastq")
     out_file1 = os.path.join(out_sub_folder1, "collect.fastq")
+
     with open(out_file, "w+") as out_f:
         with open(out_file1, "w+") as out_f1:
             with open(sam_file, "r") as in_sam:
@@ -117,7 +128,7 @@ def align(in_folder_name, ref_name):
                 for i in range(len(all_ref)):
                     out_f.write(">" + all_ref[i][0] + "_F\n")
                     out_f.write(all_ref[i][1] + "\n")
-            os.system("minimap2 -ax splice -uf -k14 --secondary=no " + out_file + " " + in_col + ".fastq > " + in_col + ".sam")
+            os.system("bowtie2 -p 2 --no-unal --local -L 16 -N 1 --mp 4 -x hg38-tRNAs -U " + in_col + ".fastq -S " + in_col + ".sam")
             os.system("samtools view -bS " + in_col + ".sam > " + in_col + ".bam")
             os.system("samtools sort " + in_col + ".bam -o " + in_col + ".sorted.bam")
             os.system("samtools view -b -q 1 " + in_col + ".sorted.bam > " + in_col + ".filtered.sorted.bam")
@@ -130,9 +141,11 @@ def align(in_folder_name, ref_name):
                 for i in range(len(all_ref)):
                     out_f.write(">" + all_ref[i][0] + "_R\n")
                     out_f.write(rev_comp(all_ref[i][1]) + "\n")
-            os.system("minimap2 -ax splice -uf -k14 --secondary=no " + out_file + " " + in_col + ".fastq > " + in_col + ".sam")
+            os.system("bowtie2 -p 2 --no-unal --local -L 16 -N 1 --mp 4 -x hg38-tRNAs -U " + in_col + ".fastq -S " + in_col + ".sam")
             os.system("samtools view -bS " + in_col + ".sam > " + in_col + ".bam")
             os.system("samtools sort " + in_col + ".bam -o " + in_col + ".sorted.bam")
             os.system("samtools view -b -q 1 " + in_col + ".sorted.bam > " + in_col + ".filtered.sorted.bam")
             os.system("samtools mpileup -Q 0 -f " + out_file + " " + in_col + ".filtered.sorted.bam > " + in_col + "_pile.txt")
 
+# Example usage:
+align("input_folder", "reference.fa")
