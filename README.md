@@ -2,7 +2,7 @@
 # NanoPsiPy: Introducing a Tool for Estimating Pseudouridine Levels Through U-to-C Base-Calling Error Analysis in Direct RNA Nanopore Sequencing Data.
 
 # Description
-NanoPsiPy method identify and quantify transcriptome-wide pseudouridine (Ψ) modification using U-to-C basecalling "error" signature as a distinctive feature of Ψ in Direct RNA sequencing data.
+NanoPsiPy method identify and semi-quantify transcriptome-wide pseudouridine (Ψ) modification using U-to-C basecalling "error" signature as a distinctive feature of Ψ in Direct RNA sequencing data.
 
 # Package versions
 The version of softwares and packages for testing codes:
@@ -47,18 +47,9 @@ and
 ## Base call
 It is advisable to basecall after completing the sequencing. If the data is not base called, use the following command to do the base call.
 ```bash
-guppy_basecaller --input_path fast5 \
-                 --recursive \
-                 --save_path fastq \
-                 --records_per_fastq 0 \
-                 --flowcell FLO-MIN106 \
-                 --kit SQK-RNA002 \
-                 --qscore_filtering \
-                 --min_qscore 7 \
-                 --cpu_threads_per_caller 3 \
-                 --num_callers 5
+guppy_basecaller rna002_70bps_hac@v3/ *.pod5 > *.bam
 ```
-"Input_path" is the path of your raw data. "Save_path" is your output folder. "Flowcell" is the type of nanopore flowcell you use. "Kit" is the version of nanopore direct RNA sequencing kit you use. Customize "cpu_threads_per_caller" and "num_caller" according to the state of your own cluster. This step is computation intensive.
+"*pod5" is the input raw data. "rna002_70bps_hac@v3" is the base-calling model. ".bam" is output bam file.
 
 
 ## A: Estimate U to C base calling "error" at each U site whole transcriptome wide in individual samples:
