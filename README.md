@@ -73,7 +73,7 @@ NanoPsiPy_estimation -i fastq_files_directory/ -r reference_file -o output_file_
  
 ## B. PSI comparison between two samples: To compare between two conditions, execute the following command to estimate the significant Ψ at each U site:
 ```bash
-NanoPsiPy_comparison -c ./control_file.csv -t ./treatment_file.csv -o output_folder -d reference_data_type -k kmers.txt (genome or transcriptome)
+NanoPsiPy_comparison -c ./control_file.csv -t ./treatment_file.csv -o output_folder -d reference_data_type (genome or transcriptome) -k kmers.txt
 ```
 1. The first argument is the control sample file generated after running **NanoPsiPy_estimation**
 2. The second argument is treatment sample file generated after running **NanoPsiPy_estimation**
