@@ -71,7 +71,7 @@ NanoPsiPy_estimation -i fastq_files_directory/ -r reference_file -o output_file_
 4. The fourth argument specifies the type of sample (Either control or treatment).
 
  
-## B. PSI comparison between two samples: To compare between two conditions, execute the following command to estimate the significant Ψ at each U site:
+## B. PSI comparison between two samples: To compare between two conditions, execute the following command to estimate the significant Ψ at each U site in specific kmers:
 ```bash
 NanoPsiPy_comparison -c ./control_file.csv -t ./treatment_file.csv -o output_folder -d reference_data_type (genome or transcriptome) -k kmers.txt
 ```
