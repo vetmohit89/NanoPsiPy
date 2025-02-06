@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/data/user/home/mbansal/mambaforge/envs/nf/bin/python
 import subprocess
 import argparse
 import sys
