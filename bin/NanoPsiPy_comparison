@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/data/user/home/mbansal/mambaforge/envs/nf/bin/python
 import subprocess
 import argparse
 import os
@@ -6,12 +6,12 @@ import os
 from NanoPsiPy.merge_script import merge_csvs
 from NanoPsiPy.chi_square import analyze
 
-def merge_and_analyze(control_file, treatment_file, output_folder, data_type):
+def merge_and_analyze(control_file, treatment_file, output_folder, data_type, kmer_file=None, significance_level=None):
     # Step 1: Run the first script (merge_script.py) 
-    merge_new = merge_csvs(control_file, treatment_file, output_folder, data_type)
+    merge_new = merge_csvs(control_file, treatment_file, output_folder, data_type, kmer_file)
 
     # Step 2: Run the second script (chi_square.py)
-    analyze(merge_new)
+    analyze(merge_new, significance_level)
     #analyze_command = [
         #"python", "chi_square.py",
         #"--input-file", os.path.join(output_folder, f"{os.path.splitext(os.path.basename(control_file))[0]}_vs_{os.path.splitext(os.path.basename(treatment_file))[0]}.csv")
@@ -25,7 +25,9 @@ if __name__ == "__main__":
     parser.add_argument('-t', '--treatment-file', required=True, help="Path to the treatment CSV file")
     parser.add_argument('-o', '--output-folder', required=True, help="Path to the output folder")
     parser.add_argument('-d', '--data-type', choices=['transcriptome', 'genome'], required=True, help="Type of data (transcriptome or genome)")
+    parser.add_argument('-k', '--kmer-file', help="Optional path to the kmer file")
+    parser.add_argument('-p', '--significance_level', choices=['p_below_5', 'p_below_1'], required=True, help="Type of data (p_value)")
     args = parser.parse_args()
 
     # Run the merged analysis function with command-line arguments
-    merge_and_analyze(args.control_file, args.treatment_file, args.output_folder, args.data_type)
+    merge_and_analyze(args.control_file, args.treatment_file, args.output_folder, args.data_type, args.kmer_file, args.significance_level)
