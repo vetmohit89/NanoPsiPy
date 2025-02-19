@@ -47,7 +47,7 @@ and
 ## Base call
 It is advisable to basecall after completing the sequencing. If the data is not base called, use the following command to do the base call.
 ```bash
-guppy_basecaller rna002_70bps_hac@v3/ *.pod5 > *.bam
+dorado basecaller rna002_70bps_hac@v3/ *.pod5 > *.bam
 ```
 "*pod5" is the input raw data. "rna002_70bps_hac@v3" is the base-calling model. ".bam" is output bam file.
 
