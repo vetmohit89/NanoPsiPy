@@ -81,6 +81,50 @@ NanoPsiPy_comparison -c ./control_file.csv -t ./treatment_file.csv -o output_fol
 4. The fourth argument specifies the type of reference file used for running **NanoPsiPy_estimation** (Either genome or transcriptome).
 5. The fifth argument specifies the input kmers for filtering the data
 
+# tRNA data analysis
+## 1. Mapping Reads to tRNA Reference
+
+Prepare your environment and reference files:
+
+```bash
+TRNA_INDEX="./reference/unique_tRNAs_with_CCA"
+TRNA_FASTA="./reference/unique_tRNAs_with_CCA.fasta"
+```
+
+Process all FASTQ files matching the pattern `Final_demux_bam.*.fastq`:
+
+```bash
+for fq in Final_demux_bam.*.fastq
+do
+  prefix="${fq%.fastq}_trna"
+  echo "Processing $fq ..."
+  bowtie2 -p 2 --no-unal --local --score-min G,20,1 --n-ceil L,0,0.25 -N 1 --mp 3 -L 10 \
+    -x "$TRNA_INDEX" \
+    -U "$fq" \
+    | samtools view -bS - \
+    | samtools sort -o "${prefix}.sorted.bam"
+
+  samtools index "${prefix}.sorted.bam"
+  samtools mpileup -d 0 -Q 10 --reverse-del -f "$TRNA_FASTA" "${prefix}.sorted.bam" > "${prefix}.mpileup"
+done
+```
+
+## 2. Generate *T_C_with_percent.STATS File
+
+After producing mpileup files for the mapped tRNA reads, use [`mpileup2stats`](https://github.com/novoalab/mpileup2stats) to convert mpileup data into stats files:
+
+```bash
+mpileup2stats -i <input.mpileup> -o <output.T_C_with_percent.STATS>
+```
+Replace `<input.mpileup>` and `<output.T_C_with_percent.STATS>` with the appropriate file names.
+
+## 3. Estimate U-to-C Base-Calling Error
+
+Use the provided [`count_T_to_C-1.py`](https://github.com/vetmohit89/NanoPsiPy/blob/main/count_T_to_C-1.py) script to estimate U-to-C base-calling errors for your tRNA stats files:
+
+```bash
+python count_T_to_C-1.py <output.T_C_with_percent.STATS> > <U_to_C_error_results.txt>
+```
 
 ## Acknowledgements:
 NanoPsiPy tool workflow was built around Nanopore_psu tool available at (https://github.com/sihaohuanguc/Nanopore_psU/)
