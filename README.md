@@ -120,7 +120,7 @@ Replace `<input.mpileup>` and `<output.T_C_with_percent.STATS>` with the appropr
 
 ## 3. Estimate U-to-C Base-Calling Error
 
-Use the provided [`count_T_to_C-1.py`](https://github.com/vetmohit89/NanoPsiPy/blob/main/count_T_to_C-1.py) script to estimate U-to-C base-calling errors for your tRNA stats files:
+Use the provided [`count_T_to_C-1.py`](https://github.com/vetmohit89/NanoPsiPy/blob/Nanopsipy/count_T_to_C-1.py) script to estimate U-to-C base-calling errors for your tRNA stats files:
 
 ```bash
 python count_T_to_C-1.py <output.T_C_with_percent.STATS> > <U_to_C_error_results.txt>
